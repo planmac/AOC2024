@@ -1,0 +1,41 @@
+(* Advent of Code 2024 - Day1 in Alice ML *)
+
+fun quicksort [] = []
+  | quicksort (x::xs) =
+    let 
+        val (left, right) = List.partition (fn y => y<x) xs
+    in
+        quicksort left @ [x] @ quicksort right
+    end
+
+fun splt []         xs ys = (xs,ys)
+  | splt (x::y::zs) xs ys = splt zs (x::xs) (y::ys)
+
+fun toInt sn = 
+  case (Int.fromString sn) of
+    SOME n => n
+    | _    => 0
+
+fun prse s = 
+    let val toks = String.tokens (fn c => Char.isSpace c) s
+    in List.map toInt toks
+    end
+
+structure Day1 = 
+struct
+  fun day1 () = 
+    let val file = TextIO.openIn "day1.txt"
+        val content = TextIO.inputAll file before TextIO.closeIn file
+        val intLst = prse content
+        val (xs,ys) = splt intLst [] []
+        val xss = quicksort xs
+        val yss = quicksort ys
+        val xys = ListPair.map (fn (x,y) => abs (x - y)) (xss,yss)
+        val res = foldl (op +) 0 xys
+    in
+        print ( Int.toString(res) ^ "\n" )
+    end
+  val _ = day1 ()
+  val _ = OS.Process.exit OS.Process.success
+end
+
