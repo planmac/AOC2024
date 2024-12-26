@@ -1,0 +1,33 @@
+(* Advent of Code 2024 - Day1 - Part 2, in Alice ML *)
+
+fun splt []         xs ys = (xs,ys)
+  | splt (x::y::zs) xs ys = splt zs (x::xs) (y::ys)
+
+fun prse s = 
+    let val toks = String.tokens (fn c => Char.isSpace c) s
+        val toInt = fn si => valOf (Int.fromString si)
+    in List.map toInt toks
+    end
+
+
+fun calc xs ys =
+    let fun addto x = x * ( length (List.filter (fn y => x = y) ys) )
+    in  map addto xs 
+    end
+
+structure Day1b = 
+struct
+  fun day1b () = 
+    let val file = TextIO.openIn "day1.txt"
+        val content = TextIO.inputAll file before TextIO.closeIn file
+        val intLst = prse content
+        val (xs,ys) = splt intLst [] []
+        val xt = calc xs ys
+        val res = foldl (op +) 0 xt
+    in
+        print ( Int.toString(res) ^ "\n" )
+    end
+  val _ = day1b ()
+  val _ = OS.Process.exit OS.Process.success
+end
+
