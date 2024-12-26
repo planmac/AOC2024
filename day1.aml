@@ -11,13 +11,9 @@ fun quicksort [] = []
 fun splt []         xs ys = (xs,ys)
   | splt (x::y::zs) xs ys = splt zs (x::xs) (y::ys)
 
-fun toInt sn = 
-  case (Int.fromString sn) of
-    SOME n => n
-    | _    => 0
-
 fun prse s = 
     let val toks = String.tokens (fn c => Char.isSpace c) s
+        val toInt = fn si => valOf (Int.fromString si)
     in List.map toInt toks
     end
 
