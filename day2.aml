@@ -1,37 +1,49 @@
 (***************************************************
-   Advent of Code 2024 - Day1 - Part 2 : Alice ML 
-   compile: alicec day1b.aml
-   run:     alicerun day1b day1.txt
+   Advent of Code 2024 - Day2 : Alice ML 
+   compile: alicec day2.aml
+   run:     alicerun day2 day2.txt
 ****************************************************)
 
-fun splt []         xs ys = (xs,ys)
-  | splt (x::y::zs) xs ys = splt zs (x::xs) (y::ys)
-
 fun prse s = 
-    let val toks = String.tokens (fn c => Char.isSpace c) s
-        val toInt = fn si => valOf (Int.fromString si)
-    in List.map toInt toks
-    end
+  let 
+    val toks = String.tokens (fn c => Char.isSpace c) s
+    val toInt = fn si => valOf (Int.fromString si)
+  in 
+    List.map toInt toks
+  end
 
-fun calc xs ys =
-    let fun addto x = x * ( length (List.filter (fn y => x = y) ys) )
-    in  map addto xs 
-    end
+(*
+fun goUp (a::b::cs) = if (a<b) andalso (b-a <=3) then goUp (b::cs) else false
+  | goUp [] = true 
 
-structure Day1b = 
+fun goDn (a::b::cs) = if (a>b) andalso (a-b <=3) then goDn (b::cs) else false
+  | goDn [] = true 
+*)
+fun goUp intlst = false
+fun goDn intlst = false
+
+fun isSafe strln = 
+  let 
+    val intlst = prse strln
+  in  
+    if (goUp intlst) orelse (goDn intlst) then 1 else 0
+  end
+
+structure Day2 = 
 struct
-  fun day1b () = 
-    let val fname = hd (CommandLine.arguments())
-        val file = TextIO.openIn fname
-        val content = TextIO.inputAll file before TextIO.closeIn file
-        val intLst = prse content
-        val (xs,ys) = splt intLst [] []
-        val xt = calc xs ys
-        val res = foldl (op +) 0 xt
+  fun day2 () = 
+    let 
+      val fname = hd (CommandLine.arguments())
+      val file = TextIO.openIn fname
+      fun doLines file n = 
+        case TextIO.inputLine file of
+          SOME strln => doLines file (n + (isSafe strln))
+          | NONE => n
     in
-        print ( Int.toString(res) ^ "\n" )
+      doLines file 0
     end
-  val _ = day1b ()
+
+  val _ = "Hello\n" (*print( day2() )*)
   val _ = OS.Process.exit OS.Process.success
 end
 
