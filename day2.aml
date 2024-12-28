@@ -19,10 +19,6 @@ fun goUp (a::b::cs) = if (a<b) andalso (b-a <=3) then goUp (b::cs) else false
 fun goDn (a::b::cs) = if (a>b) andalso (a-b <=3) then goDn (b::cs) else false
   | goDn [_] = true 
   | goDn [] = true 
-(*
-fun goUp intlst = true
-fun goDn intlst = false
-*)
 
 fun isSafe strln = 
   let 
