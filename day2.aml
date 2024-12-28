@@ -12,15 +12,17 @@ fun prse s =
     List.map toInt toks
   end
 
-(*
 fun goUp (a::b::cs) = if (a<b) andalso (b-a <=3) then goUp (b::cs) else false
+  | goUp [_] = true 
   | goUp [] = true 
 
 fun goDn (a::b::cs) = if (a>b) andalso (a-b <=3) then goDn (b::cs) else false
+  | goDn [_] = true 
   | goDn [] = true 
-*)
-fun goUp intlst = false
+(*
+fun goUp intlst = true
 fun goDn intlst = false
+*)
 
 fun isSafe strln = 
   let 
@@ -39,11 +41,12 @@ struct
         case TextIO.inputLine file of
           SOME strln => doLines file (n + (isSafe strln))
           | NONE => n
+      val res = doLines file 0
     in
-      doLines file 0
+      print( Int.toString(res) ^ "\n" )
     end
 
-  val _ = "Hello\n" (*print( day2() )*)
+  val _ = day2()
   val _ = OS.Process.exit OS.Process.success
 end
 
