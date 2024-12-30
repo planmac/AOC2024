@@ -1,0 +1,66 @@
+(***************************************************
+   Advent of Code 2024 - Day2b : Alice ML 
+   compile: alicec day2b.aml
+   run:     alicerun day2b day2.txt
+****************************************************)
+
+fun prse s = 
+  let 
+    val toks = String.tokens (fn c => Char.isSpace c) s
+    val toInt = fn si => valOf (Int.fromString si)
+  in 
+    List.map toInt toks
+  end
+
+
+fun goUp (a::b::cs) = if (a<b) andalso (b-a <=3) then goUp (b::cs) else false
+  | goUp [_] = true 
+  | goUp [] = true 
+
+fun goDn (a::b::cs) = if (a>b) andalso (a-b <=3) then goDn (b::cs) else false
+  | goDn [_] = true 
+  | goDn [] = true 
+
+fun checkUpDn intlst = (goUp intlst) orelse (goDn intlst)
+
+fun mkPerms lst = 
+let 
+  fun loop xs (z::zs) ret = loop (xs@[z]) zs ((xs@zs) :: ret)
+    | loop _ [] ret = ret
+in
+  loop [] lst [lst]
+end
+
+(* Utility fn **************************************
+fun printList [] = print "\n"
+  | printList (x::xs) = (print(Int.toString(x) ^ ", "); printList xs)
+***************************************************)
+
+fun isSafe line =
+let
+  val intlst = prse line
+  val lstlst = mkPerms intlst
+  val lsttf  = map checkUpDn lstlst
+in
+  if List.exists (fn b => b) lsttf then 1 else 0
+end
+
+structure Day2 = 
+struct
+  fun day2 () = 
+    let 
+      val fname = hd (CommandLine.arguments())
+      val file = TextIO.openIn fname
+      fun doLines file n = 
+        case TextIO.inputLine file of
+          SOME strln => doLines file (n + (isSafe strln))
+          | NONE => n
+      val res = doLines file 0
+    in
+      print( Int.toString(res) ^ "\n" )
+    end
+
+  val _ = day2()
+  val _ = OS.Process.exit OS.Process.success
+end
+
