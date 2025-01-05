@@ -1,0 +1,67 @@
+(***************************************************
+   Advent of Code 2024 - Day3 : Alice ML 
+   compile: alicec day3.aml
+   run:     alicerun day3 day3.txt
+****************************************************)
+
+(* Utility infix operator to chain functions that take one input and
+   return an optional result, bypassing fun application for NONE: 
+   'a option -> ('a -> 'b option) -> 'b option *)
+infix 1 >>=
+fun a >>= f = 
+  case a of
+  | SOME a' => f a'
+  | NONE => NONE
+
+(* Utility predicate to match / not match a single char *)
+fun isc  (c : char) = fn d => d =  c
+fun notc (c : char) = fn d => d <> c
+
+fun getx (ss,n) = (* (ss,n) -> (ss,n) option *)
+  let val (xs,yss) = Substring.splitl (notc #",") ss
+  in if (Substring.size xs) <= 3
+     then case (Int.fromString (Substring.string xs)) of
+          | SOME x => SOME ((Substring.triml 1 yss),x)
+          | NONE => NONE
+     else NONE
+  end
+
+fun gety (ss,x) = 
+  let val (ys,zss) = Substring.splitl (notc #")") ss
+  in if (Substring.size ys) <= 3
+     then case (Int.fromString (Substring.string ys)) of
+          | SOME y => SOME ((Substring.triml 1 zss), x*y)
+          | NONE => NONE
+     else NONE
+  end
+
+fun calcmul (ss,n) = (* (ss,n) -> (ss,n) *)
+  case ( SOME (ss,n) >>= getx >>= gety ) of
+  | SOME (rst,xy) => (rst,xy)
+  | NONE => (ss,0)
+
+fun findmuls (ss,n) = (* (ss,n) -> n *)
+  let val (drp,muls) = Substring.position "mul(" ss
+  in if Substring.isEmpty muls then n
+     else
+       let val (rst,xy) = calcmul ((Substring.triml 4 muls),n)
+       in findmuls (rst, n + xy)
+       end
+  end
+
+structure Day3 = 
+struct
+  fun day3 () = 
+    let 
+      val fname = hd (CommandLine.arguments())
+      val file = TextIO.openIn fname
+      val str = TextIO.inputAll file before TextIO.closeIn file
+      val res = findmuls ((Substring.full str),0)
+    in
+      print( Int.toString(res) ^ "\n" )
+    end
+
+  val _ = day3()
+  val _ = OS.Process.exit OS.Process.success
+end
+
